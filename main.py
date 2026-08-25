@@ -5,7 +5,25 @@ import requests
 from datetime import datetime, timedelta, timezone
 
 API_URL = "https://ssd.jpl.nasa.gov/api/horizons.api"
-#Solvers
+
+#Converters
+
+def degtorad(deg):
+    rad=((deg*np.pi)/180)
+    return rad
+def radtodeg(rad):
+    deg=((rad*180)/np.pi)
+    return deg
+
+def jd_to_datetime(julian_date): # Перовод из юлианской даты в обчную
+    unix_epoch = 2440587.5
+    seconds = (julian_date - unix_epoch) * 86400
+
+    return datetime(1970, 1, 1) + timedelta(seconds=seconds)
+
+#Getting an actual constants
+
+date = datetime(2026,8,25)
 
 def get_ephemeris(body_id, date=None):
 
@@ -50,20 +68,10 @@ def get_ephemeris(body_id, date=None):
 
     if "error" in data:
         raise RuntimeError(data["error"])
-
-    # Получаем текстовый результат Horizons
     text = data["result"]
-
-    # Берём только данные между $$SOE и $$EOE
     data_section = text.split("$$SOE")[1].split("$$EOE")[0].strip()
-
-    # Берём первую строку
     line = data_section.splitlines()[0]
-
-    # Разбираем CSV
     values = [x.strip() for x in line.split(",")]
-
-    # Создаём словарь
     return {
         "epoch": float(values[0]),
         "date": values[1],
@@ -83,46 +91,52 @@ def get_ephemeris(body_id, date=None):
         "apoapsis_distance": float(values[12]),
         "period": float(values[13]),
     }
+
    
+def Kepler_equation(planet):
+    eccentricity=planet["eccentricity"]
+    mean_anomaly=degtorad(planet["mean_anomaly"])
+    eccentric_anomaly=mean_anomaly
+    for i in range(0,5):
+        eccentric_anomaly=eccentric_anomaly-((eccentric_anomaly-mean_anomaly-eccentricity*np.sin(eccentric_anomaly))/(1-eccentricity*np.cos(eccentric_anomaly)))
+    
+    planet["eccentric_anomaly"]=float(eccentric_anomaly)
 
 
-def jd_to_datetime(julian_date): # Перовод из юлианской даты в обчную
-    unix_epoch = 2440587.5
-    seconds = (julian_date - unix_epoch) * 86400
-
-    return datetime(1970, 1, 1) + timedelta(seconds=seconds)
 
 #Visuals
 def orbit(semi_major_axis,eccentricity):
     semi_minor_axis = semi_major_axis * np.sqrt(1 - eccentricity**2)
     focal_distance = semi_major_axis * eccentricity
-    plot_ellipse(semi_major_axis, semi_minor_axis, focal_distance, color='black')
+    plot_ellipse(semi_major_axis, semi_minor_axis, focal_distance)
     
-def plot_ellipse(semi_major_axis, semi_minor_axis, focal_distance ,color):
-    x = np.linspace(focal_distance - semi_major_axis, focal_distance + semi_major_axis, 1000)
-    y = semi_minor_axis * np.sqrt(1 - ((x - focal_distance) ** 2) / semi_major_axis**2)
+def plot_ellipse(semi_major_axis, semi_minor_axis, focal_distance ,color='black'):
+    theta = np.linspace(0, 2*np.pi, 1000)
+    x = focal_distance+semi_major_axis*np.cos(theta)
+    y = semi_minor_axis*np.sin(theta)
     plt.plot(x, y, color=color)
     plt.plot(x, -y, color=color)
 
-def dot(semi_major_axis,eccentricity,true_anomaly,color):
+def dot(semi_major_axis,eccentricity,eccentric_anomaly,color):
     semi_minor_axis = semi_major_axis * np.sqrt(1 - eccentricity**2)
     focal_distance = semi_major_axis * eccentricity
-    x = semi_major_axis * np.cos(true_anomaly) + focal_distance
-    y = semi_minor_axis * np.sin(true_anomaly)
+    x = semi_major_axis * np.cos(eccentric_anomaly) + focal_distance
+    y = semi_minor_axis * np.sin(eccentric_anomaly)
     plt.plot(x, y, 'o', color=color)
 
 plt.plot(0, 0, 'o', color='red', markersize=10, label='Sun')
-mars=get_ephemeris(499,"2026-08-23")
-earth=get_ephemeris(399,"2026-08-23")
+mars=get_ephemeris(499, date)
+earth=get_ephemeris(399, date)
+Kepler_equation(mars)
+Kepler_equation(earth)
 
 orbit(mars["semi_major_axis"],mars["eccentricity"])
 dot(mars["semi_major_axis"],mars["eccentricity"],mars["true_anomaly"],"sienna")
 
 orbit(earth["semi_major_axis"],earth["eccentricity"])
 dot(earth["semi_major_axis"],earth["eccentricity"],earth["true_anomaly"],"green")
-plt.title("Расположение Марса и Земли на момент 2026-08-23.")
+plt.title("Mars and Earth orbital locations")
+plt.xlabel(f'Time (UTC):{date}')
 plt.axis("equal")
 plt.grid()
 plt.show()
-
-print(mars["inclination"])
