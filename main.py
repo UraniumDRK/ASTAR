@@ -114,8 +114,7 @@ def plot_ellipse(semi_major_axis, semi_minor_axis, focal_distance ,color='black'
     theta = np.linspace(0, 2*np.pi, 1000)
     x = focal_distance+semi_major_axis*np.cos(theta)
     y = semi_minor_axis*np.sin(theta)
-    plt.plot(x, y, color=color)
-    plt.plot(x, -y, color=color)
+    plt.plot(x, y, color=color) 
 
 def dot(semi_major_axis,eccentricity,eccentric_anomaly,color):
     semi_minor_axis = semi_major_axis * np.sqrt(1 - eccentricity**2)
