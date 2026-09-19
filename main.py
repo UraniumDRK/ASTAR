@@ -63,23 +63,26 @@ def get_ephemeris(body_id, date=None):
     line = data_section.splitlines()[0]
     values = [x.strip() for x in line.split(",")]
     return {
-        "epoch": float(values[0]),
-        "date": values[1],
+    "epoch": float(values[0]),
+    "date": values[1],
 
-        #Orbital Elements
-        "eccentricity": float(values[2]),                           
-        "periapsis_distance": float(values[3]),
-        "inclination": float(values[4]),
-        "longitude_of_ascending_node": float(values[5]),
-        "argument_of_periapsis": float(values[6]),
-        "periapsis_time": float(values[7]),
-        "mean_motion": float(values[8]),
-        "mean_anomaly": float(values[9]),
-        "true_anomaly": float(values[10]),
-        "semi_major_axis": float(values[11]),
-        "apoapsis_distance": float(values[12]),
-        "period": float(values[13]),
-    }
+    # Orbital Elements
+    "eccentricity": float(values[2]),
+    "periapsis_distance": float(values[3]),
+
+    # Angles -> radians
+    "inclination": np.radians(float(values[4])),
+    "longitude_of_ascending_node": np.radians(float(values[5])),
+    "argument_of_periapsis": np.radians(float(values[6])),
+    "periapsis_time": float(values[7]),
+    "mean_motion": np.radians(float(values[8])),
+    "mean_anomaly": np.radians(float(values[9])),
+    "true_anomaly": np.radians(float(values[10])),
+
+    "semi_major_axis": float(values[11]),
+    "apoapsis_distance": float(values[12]),
+    "period": float(values[13]),
+}
 
 
 def derivative_parameters(planet):
@@ -89,7 +92,7 @@ def derivative_parameters(planet):
     focal_distance = semi_major_axis * eccentricity
 
     eccentricity=planet["eccentricity"]
-    mean_anomaly=np.radians(planet["mean_anomaly"])
+    mean_anomaly=planet["mean_anomaly"]
     eccentric_anomaly=mean_anomaly
     for i in range(0,5):
             eccentric_anomaly=eccentric_anomaly-((eccentric_anomaly-mean_anomaly-eccentricity*np.sin(eccentric_anomaly))/(1-eccentricity*np.cos(eccentric_anomaly)))

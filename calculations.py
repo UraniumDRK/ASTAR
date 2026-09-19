@@ -2,7 +2,6 @@ import numpy as np
 
 #Rotational matrixes
 def Rz(angle):
-    angle = np.radians(angle)
 
     return np.array([
         [np.cos(angle), -np.sin(angle), 0],
@@ -12,7 +11,6 @@ def Rz(angle):
 
 
 def Rx(angle):
-    angle = np.radians(angle)
 
     return np.array([
         [1, 0,              0],
@@ -72,20 +70,18 @@ def angle_find(planet1,planet2): #Доработать
     day=0
     true_anomaly_1=planet1["true_anomaly"]
     true_anomaly_2=planet2["true_anomaly"]
-    initial_mean_anomaly_1=np.radians(planet1["mean_anomaly"])
-    initial_mean_anomaly_2=np.radians(planet2["mean_anomaly"])
-    mean_motion_1=np.radians(planet1["mean_motion"])
-    mean_motion_2=np.radians(planet2["mean_motion"])
+    initial_mean_anomaly_1=(planet1["mean_anomaly"])
+    initial_mean_anomaly_2=(planet2["mean_anomaly"])
+    mean_motion_1=(planet1["mean_motion"])
+    mean_motion_2=(planet2["mean_motion"])
     eccentricity_1=planet1["eccentricity"]
     eccentricity_2=planet2["eccentricity"]
     pup=np.pi+angle(planet1,planet2)
     param1=np.sqrt((1+eccentricity_1)/(1-eccentricity_1))
     param2=np.sqrt((1+eccentricity_2)/(1-eccentricity_2))
-    tolerance=1e-3
-    traj=[]
+    tolerance=1e-9
 
-
-    while abs((true_anomaly_1 - true_anomaly_2)+(pup+np.pi)) > tolerance or abs((true_anomaly_1 - true_anomaly_2)-(pup+np.pi)) > tolerance or len(traj)<=12:
+    while abs((true_anomaly_1 - true_anomaly_2)+(pup+np.pi)) > tolerance or abs((true_anomaly_1 - true_anomaly_2)-(pup+np.pi)) > tolerance:
         day=day+1
         print(day)
         mean_anomaly_1=initial_mean_anomaly_1+(mean_motion_1*day)
@@ -106,5 +102,3 @@ def angle_find(planet1,planet2): #Доработать
 
         if day==10**9:
             break
-
-    print(traj)
