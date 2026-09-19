@@ -62,11 +62,40 @@ def angle(planet1,planet2):
     ang=np.arccos((x_1*x_2+y_1*y_2+z_1*z_2)/(np.sqrt((x_1**2)+(y_1**2)+(z_1**2))*np.sqrt((x_2**2)+(y_2**2)+(z_2**2))))
     return ang
 
+def Kepler_equation(M,e):
+    E=M
+    for i in range(0,6):
+        E=E-((E-M-e*np.sin(E))/(1-e*np.cos(E)))
+    return E
+
 def angle_find(planet1,planet2): #Доработать
     day=0
-    periapsis_angle=angle(planet1,planet2)
     true_anomaly_1=planet1["true_anomaly"]
     true_anomaly_2=planet2["true_anomaly"]
-    mean_anomaly_1=planet1["mean_anomaly"]
-    mean_anomaly_2=planet2["mean_anomaly"]
-    
+    initial_mean_anomaly_1=planet1["mean_anomaly"]
+    initial_mean_anomaly_2=planet2["mean_anomaly"]
+    mean_motion_1=planet1["mean_motion"]
+    mean_motion_2=planet2["mean_motion"]
+    eccentricity_1=planet1["eccentricity"]
+    eccentricity_2=planet2["eccentricity"]
+    pup=180+angle(planet1,planet2)
+    param1=np.sqrt((1+eccentricity_1)/(1-eccentricity_1))
+    param2=np.sqrt((1+eccentricity_2)/(1-eccentricity_2))
+    tolerance=1e-3
+    while abs(pup - (true_anomaly_1 + true_anomaly_2)) > tolerance:
+        day=day+1
+        print(day)
+        mean_anomaly_1=initial_mean_anomaly_1+(mean_motion_1*day)
+        mean_anomaly_2=initial_mean_anomaly_2+(mean_motion_2*day)
+        eccentric_anomaly_1=Kepler_equation(mean_anomaly_1,eccentricity_1)
+        eccentric_anomaly_2=Kepler_equation(mean_anomaly_2,eccentricity_2)
+        true_anomaly_1=2*np.arctan(param1*np.tan(eccentric_anomaly_1/2))
+        true_anomaly_2=2*np.arctan(param2*np.tan(eccentric_anomaly_2/2))
+        true_anomaly_1 %= 2 * np.pi
+        true_anomaly_2 %= 2 * np.pi
+        if abs(pup - (true_anomaly_1 + true_anomaly_2)) < tolerance:
+            print(day)
+            print(true_anomaly_1)
+            print(true_anomaly_2)
+        if day==10**6:
+            break

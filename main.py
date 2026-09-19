@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta, timezone
 
-from calculations import orbital_rotation, angle
+from calculations import orbital_rotation, angle, angle_find
 from visuals import plot_ellipse, dot, custom_dot
 
 
@@ -115,12 +115,12 @@ custom_dot(earth["semi_major_axis"],earth["semi_minor_axis"],earth["focal_distan
 custom_dot(mars["semi_major_axis"],mars["semi_minor_axis"],mars["focal_distance"],mars["longitude_of_ascending_node"],mars["inclination"],mars["argument_of_periapsis"],0,"pink")
 custom_dot(mars["semi_major_axis"],mars["semi_minor_axis"],mars["focal_distance"],mars["longitude_of_ascending_node"],mars["inclination"],mars["argument_of_periapsis"],np.pi)
 #print(earth["longitude_of_ascending_node"])
-q=(angle(earth, mars))
-print(earth["true_anomaly"])
-print(mars["true_anomaly"])
-print(q)
-print(mars["true_anomaly"]+earth["true_anomaly"]-np.degrees(q))
-
+#q=(angle(earth, mars))
+#print(earth["true_anomaly"])
+#print(mars["true_anomaly"])
+#print(q)
+#print(mars["true_anomaly"]+earth["true_anomaly"]-np.degrees(q))
+angle_find(earth,mars)
 plt.title("Mars and Earth orbital locations")
 plt.axis("equal")
 plt.grid()
