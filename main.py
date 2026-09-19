@@ -5,8 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta, timezone
 
-from rotations import orbital_rotation
-from visuals import plot_ellipse, dot
+from calculations import orbital_rotation, angle
+from visuals import plot_ellipse, dot, custom_dot
 
 
 def jd_to_datetime(julian_date): #Transfer julian date to normal date standart
@@ -108,8 +108,19 @@ derivative_parameters(mars)
 
 plot_ellipse(mars)
 plot_ellipse(earth)
-dot(mars)
-dot(earth)
+dot(mars, "orange")
+dot(earth, "blue")
+custom_dot(earth["semi_major_axis"],earth["semi_minor_axis"],earth["focal_distance"],earth["longitude_of_ascending_node"],earth["inclination"],earth["argument_of_periapsis"],0,"pink")
+custom_dot(earth["semi_major_axis"],earth["semi_minor_axis"],earth["focal_distance"],earth["longitude_of_ascending_node"],earth["inclination"],earth["argument_of_periapsis"],np.pi)
+custom_dot(mars["semi_major_axis"],mars["semi_minor_axis"],mars["focal_distance"],mars["longitude_of_ascending_node"],mars["inclination"],mars["argument_of_periapsis"],0,"pink")
+custom_dot(mars["semi_major_axis"],mars["semi_minor_axis"],mars["focal_distance"],mars["longitude_of_ascending_node"],mars["inclination"],mars["argument_of_periapsis"],np.pi)
+#print(earth["longitude_of_ascending_node"])
+q=(angle(earth, mars))
+print(earth["true_anomaly"])
+print(mars["true_anomaly"])
+print(q)
+print(mars["true_anomaly"]+earth["true_anomaly"]-np.degrees(q))
+
 plt.title("Mars and Earth orbital locations")
 plt.axis("equal")
 plt.grid()

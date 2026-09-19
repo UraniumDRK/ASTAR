@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from rotations import orbital_rotation
+from calculations import orbital_rotation
 
 def plot_ellipse(planet, color='black'):
     inclination = planet["inclination"]
@@ -34,7 +34,7 @@ def plot_ellipse(planet, color='black'):
 
     plt.plot(x, y, color=color)
 
-def dot(planet):
+def dot(planet,color="black"):
     inclination = planet["inclination"]
     longitude_of_ascending_node = planet["longitude_of_ascending_node"]
     argument_of_periapsis = planet["argument_of_periapsis"]
@@ -57,4 +57,22 @@ def dot(planet):
     point_rotated = R @ point
     x = point_rotated[0]
     y = point_rotated[1]
-    plt.plot(x, y, 'o')   
+    plt.plot(x, y, 'o', color=color)   
+
+def custom_dot(semi_major_axis,semi_minor_axis,focal_distance,Omega,i,omega,eccentric_anomaly,color="black"):
+    R = orbital_rotation(
+        Omega,
+        i,
+        omega
+    )
+
+    point=np.array([
+        semi_major_axis * np.cos(eccentric_anomaly) + focal_distance,
+        semi_minor_axis * np.sin(eccentric_anomaly),
+        0
+        ])
+    point_rotated = R @ point
+    x = point_rotated[0]
+    y = point_rotated[1]
+    
+    plt.plot(x, y, 'o', color=color)   
